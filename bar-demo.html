@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>青岛大屏</title>
+    <link rel="stylesheet" href="css/common.css">
+    <script>
+        (function(designWidth, maxWidth) {
+            var doc = document,
+                win = window,
+                docEl = doc.documentElement,
+                remStyle = document.createElement("style"),
+                tid;
+
+            function refreshRem() {
+                var width = docEl.getBoundingClientRect().width;
+                maxWidth = maxWidth || 540;
+                width>maxWidth && (width=maxWidth);
+                var rem = width * 57.6 / designWidth;
+                if(rem<=12){
+                    remStyle.innerHTML = 'html{font-size:12px;}';
+                }else{
+                    remStyle.innerHTML = 'html{font-size:' + rem + 'px;}';
+                }
+            }
+
+            if (docEl.firstElementChild) {
+                docEl.firstElementChild.appendChild(remStyle);
+            } else {
+                var wrap = doc.createElement("div");
+                wrap.appendChild(remStyle);
+                doc.write(wrap.innerHTML);
+                wrap = null;
+            }
+            //要等 wiewport 设置好后才能执行 refreshRem，不然 refreshRem 会执行2次；
+            refreshRem();
+
+            win.addEventListener("resize", function() {
+                clearTimeout(tid); //防止执行两次
+                tid = setTimeout(refreshRem, 300);
+            }, false);
+
+            win.addEventListener("pageshow", function(e) {
+                if (e.persisted) { // 浏览器后退的时候重新计算
+                    clearTimeout(tid);
+                    tid = setTimeout(refreshRem, 300);
+                }
+            }, false);
+
+            if (doc.readyState === "complete") {
+                doc.body.style.fontSize = "16px";
+            } else {
+                doc.addEventListener("DOMContentLoaded", function(e) {
+                    doc.body.style.fontSize = "16px";
+                }, false);
+            }
+        })(5760, 5760);
+    </script>
+</head>
+<body>
+<div style="width: 100rem;height: 30rem">
+    <canvas id="main" width="50" height="30"></canvas>
+</div>
+<script src="js/jquery.min.js"></script>
+<script>
+    function drawCylinder(context, x, per, a, b, color_1,color_2,remVal)
+    {
+        var step = (a > b) ? 1 / a : 1 / b;
+        var footerLine=36*0.8*remVal-remVal;
+        var y=footerLine-footerLine*(per)/115;
+        context.beginPath();
+        context.moveTo(x - a, y);
+        for (var i = 0; i < 2 * Math.PI; i += step)
+        {
+            context.lineTo(x - a * Math.cos(i), y + b * Math.sin(i));
+        }
+        context.closePath();
+        ctx.fillStyle=color_1;
+        context.fill();
+
+        context.beginPath();
+        context.moveTo(x + a, y);
+        context.lineTo(x + a, footerLine);
+        for (var i = 0; i < Math.PI; i += step)
+        {
+            context.lineTo(x + a * Math.cos(i), footerLine+ b * Math.sin(i));
+        }
+        context.lineTo(x-a, y);
+        for (var i = 0; i < Math.PI; i += step)
+        {
+            context.lineTo(x - a * Math.cos(i), y + b * Math.sin(i)-2);
+        }
+        ctx.fillStyle=color_2;
+        context.fill();
+    }
+    function drawLine(ctx,num,value,remVal) {
+        ctx.fillStyle='#5980ff';
+        ctx.strokeStyle='#4672ff';
+        ctx.font = remVal+"px 雅黑";
+        ctx.fillText(value,remVal, (6-num)*6*0.8*remVal-remVal);
+        ctx.beginPath();
+        ctx.moveTo(2.5*remVal,(6-num)*6*0.8*remVal-0.2*remVal-remVal);
+        ctx.lineTo(45*remVal,(6-num)*6*0.8*remVal-0.2*remVal-remVal);
+        ctx.closePath();
+        ctx.stroke();
+    }
+    var can = document.getElementById('main');
+    var ctx = can.getContext("2d");
+    var fontSize= $('html').css('font-size');
+    var remVal = fontSize.substr(0,fontSize.length-2);
+    $(can).attr('width',$(can).attr('width')*remVal);
+    $(can).attr('height',$(can).attr('height')*remVal);
+    xArray=[0,10,20,30,40,50];
+    for(var n=0;n<6;n++){
+        drawLine(ctx,n,xArray[n],remVal);
+    }
+    var color_bar=[['#6d80cc','#5066af'],['#71c6d3','#4b99a5'],['#e78dad','#cf5f87'],['#85dda0','#6ab581'],['#936dd5','#754cbb'],['#788e95','#55676d']]
+    for(var m=1;m<=6;m++){
+        drawCylinder(ctx, 6.8*remVal*m, 50, 2*remVal, 1.3*remVal,color_bar[m-1][0],color_bar[m-1][1],remVal);
+    }
+</script>
+</body>
+</html>
