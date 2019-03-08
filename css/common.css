@@ -417,6 +417,15 @@ a,a:hover{color:#333;}
     text-shadow: 0 0.1rem 0 #0078ff;
     padding-left:  1rem;
 }
+.middle-part .left-part .part-3 .title-box .loading-icon{
+    width: 1.2rem;
+    height: 1.2rem;
+    display: inline-block;
+    background: no-repeat url(../img/svg/bars.svg);
+    background-size: cover;
+    vertical-align: top;
+    margin-top: .4rem;
+}
 .middle-part .left-part .part-3 .title-box .title{
     margin-right: 1rem;
 }
